@@ -174,12 +174,17 @@ class CryoCon(Device):
 
     async def init_device(self):
         await super().init_device()
+
         channels = ''.join(self.UsedChannels)
         loops = self.UsedLoops
 
         url, kwargs = self.url_to_connection_args()
         conn = connection_for_url(url, **kwargs)
         self.cryocon = cryocon.CryoCon(conn, channels=channels, loops=loops)
+
+        self.create_channels(channels)
+        self.create_loops(loops)
+
         self.last_values = {}
         self.last_state_ts = 0
 
