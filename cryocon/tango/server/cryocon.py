@@ -82,7 +82,6 @@ ATTR_MAP = {
 }
 
 
-
 class CryoCon(Device):
 
     green_mode = GreenMode.Asyncio
@@ -96,6 +95,68 @@ class CryoCon(Device):
     UsedLoops = device_property([int], default_value=[1, 2, 3, 4])
     ReadValidityPeriod = device_property(float, default_value=0.1)
     AutoLockFrontPanel = device_property(bool, default_value=False)
+
+    channelA = None
+    channelB = None
+    channelC = None
+    channelD = None
+    channel_attrs = [channelA, channelB, channelC, channelD]
+
+    loop1output = None
+    loop1range = None
+    loop1ramp = None
+    loop1type = None
+    loop1setpoint = None
+    loop1pgain = None
+    loop1igain = None
+    loop1dgain = None
+    loop1_attrs = [loop1output, loop1range, loop1ramp, loop1type,
+                   loop1setpoint, loop1pgain, loop1igain, loop1dgain]
+
+    loop2output = None
+    loop2range = None
+    loop2ramp = None
+    loop2type = None
+    loop2setpoint = None
+    loop2pgain = None
+    loop2igain = None
+    loop2dgain = None
+    loop2_attrs = [loop2output, loop2range, loop2ramp, loop2type,
+                   loop2setpoint, loop2pgain, loop2igain, loop2dgain]
+
+    loop3output = None
+    loop3range = None
+    loop3ramp = None
+    loop3type = None
+    loop3setpoint = None
+    loop3pgain = None
+    loop3igain = None
+    loop3dgain = None
+    loop3_attrs = [loop3output, loop3range, loop3ramp, loop3type,
+                   loop3setpoint, loop3pgain, loop3igain, loop3dgain]
+
+    loop4output = None
+    loop4range = None
+    loop4ramp = None
+    loop4type = None
+    loop4setpoint = None
+    loop4pgain = None
+    loop4igain = None
+    loop4dgain = None
+    loop4_attrs = [loop4output, loop4range, loop4ramp, loop4type,
+                   loop4setpoint, loop4pgain, loop4igain, loop4dgain]
+
+    all_loop_attrs = [loop1_attrs, loop2_attrs, loop3_attrs, loop4_attrs]
+
+    def delete_loops(self):
+        for item in self.all_loop_attrs:
+            for l in item:
+                item = None
+        return True
+
+    def delete_channels(self):
+        for item in self.channel_attrs:
+            item = None
 
     def url_to_connection_args(self):
         url = self.url
@@ -125,6 +186,8 @@ class CryoCon(Device):
     async def delete_device(self):
         super().delete_device()
         try:
+            self.delete_channels()
+            self.delete_loops()
             await self.cryocon._conn.close()
         except Exception:
             logging.exception('Error closing cryocon')
@@ -175,43 +238,65 @@ class CryoCon(Device):
         return status
 
     idn = attr(name='idn', label='ID', dtype=str)
-    channelA = attr(name='channelA', label='Channel A', unit='K')
-    channelB = attr(name='channelB', label='Channel B', unit='K')
-    channelC = attr(name='channelC', label='Channel C', unit='K')
-    channelD = attr(name='channelD', label='Channel D', unit='K')
-    loop1output = attr(name='loop1output', label='Loop 1 Output', unit='%')
-    loop2output = attr(name='loop2output', label='Loop 2 Output', unit='%')
-    loop3output = attr(name='loop3output', label='Loop 3 Output', unit='%')
-    loop4output = attr(name='loop4output', label='Loop 4 Output', unit='%')
-    loop1range = attr(name='loop1range', label='Loop 1 Range', dtype='str')
-    loop1rate = attr(name='loop1rate', label='Loop 1 Rate', unit='K/min', min_value=0, max_value=100)
-    loop2rate = attr(name='loop2rate', label='Loop 2 Rate', unit='K/min', min_value=0, max_value=100)
-    loop3rate = attr(name='loop3rate', label='Loop 3 Rate', unit='K/min', min_value=0, max_value=100)
-    loop4rate = attr(name='loop4rate', label='Loop 4 Rate', unit='K/min', min_value=0, max_value=100)
-    loop1ramp = attr(name='loop1ramp', label='Loop 1 Ramp', dtype=bool)
-    loop2ramp = attr(name='loop2ramp', label='Loop 2 Ramp', dtype=bool)
-    loop3ramp = attr(name='loop3ramp', label='Loop 3 Ramp', dtype=bool)
-    loop4ramp = attr(name='loop4ramp', label='Loop 4 Ramp', dtype=bool)
-    loop1type = attr(name='loop1type', label='Loop 1 Type', dtype=str)
-    loop2type = attr(name='loop2type', label='Loop 2 Type', dtype=str)
-    loop3type = attr(name='loop3type', label='Loop 3 Type', dtype=str)
-    loop4type = attr(name='loop4type', label='Loop 4 Type', dtype=str)
-    loop1setpoint = attr(name='loop1setpoint', label='Loop 1 SetPoint', unit='K')
-    loop2setpoint = attr(name='loop2setpoint', label='Loop 1 SetPoint', unit='K')
-    loop3setpoint = attr(name='loop3setpoint', label='Loop 1 SetPoint', unit='K')
-    loop4setpoint = attr(name='loop4setpoint', label='Loop 1 SetPoint', unit='K')
-    loop1pgain = attr(name='loop1pgain', label='Loop 1 P gain')
-    loop2pgain = attr(name='loop2pgain', label='Loop 2 P gain')
-    loop3pgain = attr(name='loop3pgain', label='Loop 3 P gain')
-    loop4pgain = attr(name='loop4pgain', label='Loop 4 P gain')
-    loop1igain = attr(name='loop1igain', label='Loop 1 I gain', unit='s')
-    loop2igain = attr(name='loop2igain', label='Loop 2 I gain', unit='s')
-    loop3igain = attr(name='loop3igain', label='Loop 3 I gain', unit='s')
-    loop4igain = attr(name='loop4igain', label='Loop 4 I gain', unit='s')
-    loop1dgain = attr(name='loop1dgain', label='Loop 1 D gain', unit='Hz')
-    loop2dgain = attr(name='loop2dgain', label='Loop 2 D gain', unit='Hz')
-    loop3dgain = attr(name='loop3dgain', label='Loop 3 D gain', unit='Hz')
-    loop4dgain = attr(name='loop4dgain', label='Loop 4 D gain', unit='Hz')
+
+    def create_channels(self, channels):
+
+        channels = [x.upper() for x in channels]
+        if 'A' in channels:
+            self.channelA = attr(name='channelA', label='Channel A', unit='K')
+        if 'B' in channels:
+            self.channelB = attr(name='channelB', label='Channel B', unit='K')
+        if 'C' in channels:
+            self.channelC = attr(name='channelC', label='Channel C', unit='K')
+        if 'D' in channels:
+            self.channelD = attr(name='channelD', label='Channel D', unit='K')
+        if not channels:
+            raise ValueError("Please fill device property 'UsedChannels'.")
+
+    def create_loops(self, loops):
+
+        if '1' in loops:
+            self.loop1output = attr(name='loop1output', label='Loop 1 Output', unit='%')
+            self.loop1range = attr(name='loop1range', label='Loop 1 Range', dtype='str')
+            self.loop1ramp = attr(name='loop1ramp', label='Loop 1 Ramp', dtype=bool)
+            self.loop1type = attr(name='loop1type', label='Loop 1 Type', dtype=str)
+            self.loop1setpoint = attr(name='loop1setpoint', label='Loop 1 SetPoint', unit='K')
+            self.loop1pgain = attr(name='loop1pgain', label='Loop 1 P gain')
+            self.loop1igain = attr(name='loop1igain', label='Loop 1 I gain', unit='s')
+            self.loop1dgain = attr(name='loop1dgain', label='Loop 1 D gain', unit='Hz')
+
+        if '2' in loops:
+            self.loop2output = attr(name='loop2output', label='Loop 2 Output', unit='%')
+            self.loop2range = attr(name='loop2range', label='Loop 2 Range', dtype='str')
+            self.loop2ramp = attr(name='loop2ramp', label='Loop 2 Ramp', dtype=bool)
+            self.loop2type = attr(name='loop2type', label='Loop 2 Type', dtype=str)
+            self.loop2setpoint = attr(name='loop2setpoint', label='Loop 2 SetPoint', unit='K')
+            self.loop2pgain = attr(name='loop2pgain', label='Loop 2 P gain')
+            self.loop2igain = attr(name='loop2igain', label='Loop 2 I gain', unit='s')
+            self.loop2dgain = attr(name='loop2dgain', label='Loop 2 D gain', unit='Hz')
+
+        if '3' in loops:
+            self.loop3output = attr(name='loop3output', label='Loop 3 Output', unit='%')
+            self.loop3range = attr(name='loop3range', label='Loop 3 Range', dtype='str')
+            self.loop3ramp = attr(name='loop3ramp', label='Loop 3 Ramp', dtype=bool)
+            self.loop3type = attr(name='loop3type', label='Loop 3 Type', dtype=str)
+            self.loop3setpoint = attr(name='loop3setpoint', label='Loop 3 SetPoint', unit='K')
+            self.loop3pgain = attr(name='loop3pgain', label='Loop 3 P gain')
+            self.loop3igain = attr(name='loop3igain', label='Loop 3 I gain', unit='s')
+            self.loop3dgain = attr(name='loop3dgain', label='Loop 3 D gain', unit='Hz')
+
+        if '4' in loops:
+            self.loop4output = attr(name='loop4output', label='Loop 3 Output', unit='%')
+            self.loop4range = attr(name='loop4range', label='Loop 3 Range', dtype='str')
+            self.loop4ramp = attr(name='loop4ramp', label='Loop 3 Ramp', dtype=bool)
+            self.loop4type = attr(name='loop4type', label='Loop 3 Type', dtype=str)
+            self.loop4setpoint = attr(name='loop4setpoint', label='Loop 3 SetPoint', unit='K')
+            self.loop4pgain = attr(name='loop4pgain', label='Loop 3 P gain')
+            self.loop4igain = attr(name='loop4igain', label='Loop 3 I gain', unit='s')
+            self.loop4dgain = attr(name='loop4dgain', label='Loop 3 D gain', unit='Hz')
+
+        if not loops:
+            raise ValueError("Please fill device property 'UsedLoops'.")
 
     @command
     def on(self):
